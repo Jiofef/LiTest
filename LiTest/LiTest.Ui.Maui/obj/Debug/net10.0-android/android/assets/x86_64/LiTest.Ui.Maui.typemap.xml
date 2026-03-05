@@ -1,0 +1,10 @@
+<api type="debug" assembly-name="LiTest.Ui.Maui" mvid="a05aabeaa9ec48acaa6496ceb2b5a62f">
+  <java-to-managed>
+    <entry java-name="crc64e24190d59113d0ad/MainActivity" managed-name="LiTest.Ui.Maui.MainActivity, LiTest.Ui.Maui" managed-type-token-id="33554442" />
+    <entry java-name="crc64e24190d59113d0ad/MainApplication" managed-name="LiTest.Ui.Maui.MainApplication, LiTest.Ui.Maui" managed-type-token-id="33554443" />
+  </java-to-managed>
+  <managed-to-java>
+    <entry java-name="crc64e24190d59113d0ad/MainActivity" managed-name="LiTest.Ui.Maui.MainActivity, LiTest.Ui.Maui" managed-type-token-id="33554442" />
+    <entry java-name="crc64e24190d59113d0ad/MainApplication" managed-name="LiTest.Ui.Maui.MainApplication, LiTest.Ui.Maui" managed-type-token-id="33554443" />
+  </managed-to-java>
+</api>
