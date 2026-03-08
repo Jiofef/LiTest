@@ -1,0 +1,6 @@
+@LiTest.Server.Core_HostAddress = http://localhost:5067
+
+GET {{LiTest.Server.Core_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

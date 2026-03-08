@@ -1,0 +1,14 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\LiTest.Core\LiTest.Shared.Core.csproj" />
+    <ProjectReference Include="..\LiTest.Server.Infrastructure\LiTest.Server.Infrastructure.csproj" />
+  </ItemGroup>
+
+</Project>
