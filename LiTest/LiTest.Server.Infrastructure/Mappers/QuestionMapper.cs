@@ -12,14 +12,14 @@ namespace LiTest.Server.Infrastructure.Mappers
 
         // --- CONTENT MAPPING (IQuestionContent) ---
 
-        protected IQuestionContentDto MapContentToDto(IQuestionContentEntity entity) => entity switch
+        protected IQuestionContentDto MapContentToDto(QuestionContentEntityAbstract entity) => entity switch
         {
             QuestionOptionsContentEntity e => MapOptionsToDto(e),
             QuestionTextContentEntity e => MapTextToDto(e),
             _ => throw new NotSupportedException($"Unknown content entity type: {entity.GetType()}")
         };
 
-        protected IQuestionContentEntity MapContentToEntity(IQuestionContentDto dto) => dto switch
+        protected QuestionContentEntityAbstract MapContentToEntity(IQuestionContentDto dto) => dto switch
         {
             QuestionOptionsContentDto d => MapOptionsToEntity(d),
             QuestionTextContentDto d => MapTextToEntity(d),
@@ -28,7 +28,7 @@ namespace LiTest.Server.Infrastructure.Mappers
 
         // --- ANSWER MAPPING (Answer) ---
 
-        protected AnswerDtos MapAnswerToDto(AnswerEntity entity) => entity switch
+        protected AnswerDtos MapAnswerToDto(AnswerEntityAbstract entity) => entity switch
         {
             OneAnswerEntity e => MapOneToDto(e),
             MultiAnswerEntity e => MapMultiToDto(e),
@@ -36,7 +36,7 @@ namespace LiTest.Server.Infrastructure.Mappers
             _ => throw new NotSupportedException($"Unknown answer entity type: {entity.GetType()}")
         };
 
-        protected AnswerEntity MapAnswerToEntity(AnswerDtos dto) => dto switch
+        protected AnswerEntityAbstract MapAnswerToEntity(AnswerDtos dto) => dto switch
         {
             OneAnswerDto d => MapOneToEntity(d),
             MultiAnswerDto d => MapMultiToEntity(d),

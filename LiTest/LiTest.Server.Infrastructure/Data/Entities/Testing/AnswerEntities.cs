@@ -2,31 +2,31 @@
 
 namespace LiTest.Server.Infrastructure.Testing
 {
-    public interface AnswerEntity
+    public abstract class AnswerEntityAbstract
     {
-        public QuestionTypeEnum AnswerType { get; }
-        public bool IsEmpty { get; }
+        public abstract QuestionTypeEnum AnswerType { get; }
+        public abstract bool IsEmpty { get; }
     }
-    public class OneAnswerEntity : AnswerEntity
+    public class OneAnswerEntity : AnswerEntityAbstract
     {
-        public QuestionTypeEnum AnswerType => QuestionTypeEnum.OneAnswer;
+        public override QuestionTypeEnum AnswerType => QuestionTypeEnum.OneAnswer;
 
         public int OptionId = -1;
-        public bool IsEmpty => OptionId == -1;
+        public override bool IsEmpty => OptionId == -1;
 
     }
-    public class MultiAnswerEntity : AnswerEntity
+    public class MultiAnswerEntity : AnswerEntityAbstract
     {
-        public QuestionTypeEnum AnswerType => QuestionTypeEnum.MultiAnswer;
+        public override QuestionTypeEnum AnswerType => QuestionTypeEnum.MultiAnswer;
 
         public List<int> OptionIds = new();
-        public bool IsEmpty => OptionIds.Count == 0;
+        public override bool IsEmpty => OptionIds.Count == 0;
     }
-    public class TextAnswerEntity : AnswerEntity
+    public class TextAnswerEntity : AnswerEntityAbstract
     {
-        public QuestionTypeEnum AnswerType => QuestionTypeEnum.TextAnswer;
+        public override QuestionTypeEnum AnswerType => QuestionTypeEnum.TextAnswer;
 
         public string Answer = string.Empty;
-        public bool IsEmpty => string.IsNullOrEmpty(Answer);
+        public override bool IsEmpty => string.IsNullOrEmpty(Answer);
     }
 }

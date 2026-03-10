@@ -3,7 +3,7 @@
 namespace LiTest.Shared.Core.Testing
 {
     public enum QuestionTypeEnum { OneAnswer, MultiAnswer, TextAnswer }
-    public record QuestionDto(QuestionTypeEnum QuestionType, string? Text, List<Guid> ImageUids, IQuestionContentDto Content, AnswerDtos CorrectAnswer);
+    public record QuestionDto(QuestionTypeEnum QuestionType, string? Text, List<Guid> ImageUids, IQuestionContentDto Content, AnswerDtoAbstract CorrectAnswer);
 
     [JsonPolymorphic(TypeDiscriminatorPropertyName = "$contentKind")]
     [JsonDerivedType(typeof(QuestionOptionsContentDto), "options")]

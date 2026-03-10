@@ -1,6 +1,6 @@
 <Solution>
   <Project Path="LiTest.Core/LiTest.Shared.Core.csproj" Id="e264abfc-3f70-4450-92c0-2a9d7723d8fe" />
-  <Project Path="LiTest.Server.Core/LiTest.Server.Api.csproj" Id="4f9fa498-67e8-49b6-9793-a0b2e4917c3c" />
+  <Project Path="LiTest.Server.Api/LiTest.Server.Api.csproj" />
   <Project Path="LiTest.Server.Infrastructure/LiTest.Server.Infrastructure.csproj" Id="4ffb8da7-6656-428e-87d1-ebf55678abc0" />
   <Project Path="LiTest.Server.Services/LiTest.Server.Services.csproj" Id="b3d0a57a-8d06-469d-8343-be850c3b4667" />
   <Project Path="LiTest.Ui.Maui/LiTest.Client.Ui.Maui.csproj">

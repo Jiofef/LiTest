@@ -7,11 +7,11 @@ namespace LiTest.Shared.Core.Testing
         public QuestionTypeEnum QuestionType;
         public string? Text;
         public List<Guid> ImageUids = new();
-        public IQuestionContentEntity Content = new QuestionOptionsContentEntity();
-        public AnswerEntity CorrectAnswer = new OneAnswerEntity();
+        public QuestionContentEntityAbstract Content = new QuestionOptionsContentEntity();
+        public AnswerEntityAbstract CorrectAnswer = new OneAnswerEntity();
     }
-    public interface IQuestionContentEntity { }
-    public class QuestionOptionsContentEntity : IQuestionContentEntity
+    public abstract class QuestionContentEntityAbstract { }
+    public class QuestionOptionsContentEntity : QuestionContentEntityAbstract
     {
         public List<QuestionOptionEntity> Options = new();
     }
@@ -20,7 +20,7 @@ namespace LiTest.Shared.Core.Testing
         public string Title = "Option";
         public int Id;
     }
-    public class QuestionTextContentEntity : IQuestionContentEntity
+    public class QuestionTextContentEntity : QuestionContentEntityAbstract
     {
         public string DefaultText = "Your answer...";
     }
