@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
@@ -13,6 +13,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\LiTest.Core\LiTest.Shared.Core.csproj" />
+    <ProjectReference Include="..\LiTest.Server.Core\LiTest.Server.Core.csproj" />
     <ProjectReference Include="..\LiTest.Server.Services\LiTest.Server.Services.csproj" />
   </ItemGroup>
 

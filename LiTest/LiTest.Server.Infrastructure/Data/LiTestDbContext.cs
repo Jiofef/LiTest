@@ -18,7 +18,7 @@ namespace LiTest.Server.Infrastructure.Data
         {
             // Users
             modelBuilder.Entity<UserEntity>()
-                .HasIndex(u => u.Email)
+                .HasIndex(u => u.Login)
                 .IsUnique();
 
             // Litests

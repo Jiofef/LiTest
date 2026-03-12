@@ -1,4 +1,5 @@
-﻿using LiTest.Server.Infrastructure.Testing;
+﻿using LiTest.Server.Core.Contracts.Data;
+using LiTest.Server.Infrastructure.Testing;
 using LiTest.Shared.Core.Community;
 using LiTest.Shared.Core.Testing;
 using Microsoft.EntityFrameworkCore;
@@ -65,32 +66,21 @@ namespace LiTest.Server.Infrastructure.Data
             }
             return false;
         }
-        public enum TestsSortEnum { Passers, Likes, Latest, Earliest }
-        public enum TestsIncludeModeEnum { Min, IncludeQuestions, IncludeAll }
-        public class LiTestGetOptions
-        {
-            public LiTestGetOptions(TestsIncludeModeEnum getMode = TestsIncludeModeEnum.Min, TestsSortEnum sortMode = TestsSortEnum.Passers)
-            {
-                IncludeMode = getMode;
-                SortMode = sortMode;
-            }
-            public TestsIncludeModeEnum IncludeMode { get; set; }
-            public TestsSortEnum SortMode { get; set; }
-        }
+
         private IQueryable<LiTestEntity> GetLitestQueryIncluding(IQueryable<LiTestEntity> queryable, TestsIncludeModeEnum includeMode)
         {
             var resultQueryable = queryable;
             if (includeMode >= TestsIncludeModeEnum.IncludeQuestions)
             {
-                var questionQuery = resultQueryable.
+                resultQueryable = resultQueryable.
                     Include(lt => lt.Questions).ThenInclude(q => q.CorrectAnswer);
 
                 if (includeMode == TestsIncludeModeEnum.IncludeAll)
-                    resultQueryable = questionQuery
+                {
+                    resultQueryable = resultQueryable
                         .Include(lt => lt.Questions)
                         .ThenInclude(q => (q.Content as QuestionOptionsContentEntity)!.Options);
-                else
-                    resultQueryable = questionQuery;
+                }
             }
             return resultQueryable;
         }
@@ -110,7 +100,7 @@ namespace LiTest.Server.Infrastructure.Data
                     return queryable;
             }
         }
-        public async Task<List<LiTestEntity>> GetTests(IEnumerable<Guid> ids, LiTestGetOptions options)
+        public async Task<List<LiTestEntity>> GetTestsAsync(IEnumerable<Guid> ids, LiTestGetOptions options)
         {
             var ctx = await _ctxFactory.CreateDbContextAsync();
 
@@ -123,8 +113,17 @@ namespace LiTest.Server.Infrastructure.Data
 
             return await queryable.ToListAsync();
         }
+        public async Task<LiTestEntity?> TryGetTestAsync(Guid id)
+        {
+            var ctx = await _ctxFactory.CreateDbContextAsync();
 
-        public async Task<List<LiTestEntity>> SearchTests(string query, int lastId, LiTestGetOptions options, int limit = 20)
+            var result = await ctx.Tests
+                .AsNoTracking()
+                .FirstOrDefaultAsync(u => u.Id == id);
+
+            return result;
+        }
+        public async Task<List<LiTestEntity>> SearchTestsAsync(string query, int lastId, LiTestGetOptions options, int limit = 20)
         {
             var ctx = await _ctxFactory.CreateDbContextAsync();
 

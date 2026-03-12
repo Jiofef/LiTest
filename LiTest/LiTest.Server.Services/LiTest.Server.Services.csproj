@@ -7,7 +7,13 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="FluentValidation" Version="12.1.1" />
+    <PackageReference Include="FluentValidation.DependencyInjectionExtensions" Version="12.1.1" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\LiTest.Core\LiTest.Shared.Core.csproj" />
+    <ProjectReference Include="..\LiTest.Server.Core\LiTest.Server.Core.csproj" />
     <ProjectReference Include="..\LiTest.Server.Infrastructure\LiTest.Server.Infrastructure.csproj" />
   </ItemGroup>
 

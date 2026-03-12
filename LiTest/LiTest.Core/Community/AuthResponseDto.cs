@@ -4,5 +4,5 @@ using System.Text;
 
 namespace LiTest.Shared.Core.Community
 {
-    public record UserDto(Guid Id, Guid? AvatarUid, string Nickname, List<Guid> UserTestIds);
+    public record AuthResponseDto(string AccessToken, string RefreshToken);
 }

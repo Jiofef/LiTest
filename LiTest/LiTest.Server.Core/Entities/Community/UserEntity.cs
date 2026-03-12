@@ -1,4 +1,5 @@
 ﻿using LiTest.Server.Infrastructure.Data.Entities.Testing;
+using LiTest.Server.Services;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -9,12 +10,14 @@ namespace LiTest.Shared.Core.Community
     {
         // Metadata
         public Guid Id { get; set; }
-        public Guid AvatarUid { get; set; }
-        public string Email { get; set; } = string.Empty;
+        public Guid? AvatarUid { get; set; }
+        public string Login { get; set; } = string.Empty;
         public string PasswordHashed { get; set; } = string.Empty;
         public string Nickname { get; set; } = string.Empty;
 
         public DateTimeOffset? DeletedAt = null;
+
+        public UserRefreshTokenEntity RefreshToken { get; set; }
 
         //
         public List<Guid> UserTestIds { get; set; } = new();

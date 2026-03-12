@@ -1,5 +1,9 @@
+using LiTest.Server.Infrastructure;
 using LiTest.Server.Infrastructure.Data;
+using LiTest.Server.Infrastructure.Security;
+using LiTest.Server.Services;
 using Microsoft.EntityFrameworkCore;
+using Serilog;
 using Swashbuckle.AspNetCore.Swagger;
 
 public partial class Program
@@ -37,10 +41,25 @@ public partial class Program
 
     private static void ConfigureDiBuilder(WebApplicationBuilder builder)
     {
+        // Services
+        builder.Services.AddInfrastructureServices();
+        builder.Services.AddApplicationServices();
+        
+        // Database connection
         builder.Services.AddPooledDbContextFactory<LiTestDbContext>((options) =>
         {
             var connString = builder.Configuration.GetConnectionString("LiTestDefaultConnection");
             options.UseNpgsql(connString);
         });
+
+        // Logging
+        Log.Logger = new LoggerConfiguration()
+            .WriteTo.Console()
+            .WriteTo.File("logs/log-.txt", rollingInterval: RollingInterval.Day)
+            .CreateLogger();
+        builder.Host.UseSerilog();
+
+        // Options
+        builder.Services.Configure<JwtOptions>(builder.Configuration.GetSection("JwtSettings"));
     }
 }

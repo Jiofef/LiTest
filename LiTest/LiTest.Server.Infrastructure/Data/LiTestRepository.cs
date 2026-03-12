@@ -1,13 +1,10 @@
-﻿using LiTest.Server.Infrastructure.Testing;
-using LiTest.Shared.Core.Community;
-using LiTest.Shared.Core.Testing;
+﻿using LiTest.Server.Core.Contracts.Data;
 using Microsoft.EntityFrameworkCore;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 
 namespace LiTest.Server.Infrastructure.Data
 {
-    public partial class LiTestRepository
+    public partial class LiTestRepository : ILiTestRepository
     {
         private readonly IDbContextFactory<LiTestDbContext> _ctxFactory;
 

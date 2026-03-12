@@ -1,4 +1,5 @@
-﻿using LiTest.Server.Infrastructure.Testing;
+﻿using LiTest.Server.Core.Contracts.Data;
+using LiTest.Server.Infrastructure.Testing;
 using LiTest.Shared.Core.Community;
 using LiTest.Shared.Core.Testing;
 using Microsoft.EntityFrameworkCore;
@@ -66,34 +67,31 @@ namespace LiTest.Server.Infrastructure.Data
             }
             return false;
         }
-        public enum UsersIncludeModeEnum { Min, IncludeAll }
-        public class UsersGetOptions
-        {
-            public UsersGetOptions(UsersIncludeModeEnum getMode = UsersIncludeModeEnum.Min)
-            {
-                IncludeMode = getMode;
-            }
-            public UsersIncludeModeEnum IncludeMode { get; set; }
-        }
         private IQueryable<UserEntity> GetUsersQueryIncluding(IQueryable<UserEntity> queryable, UsersIncludeModeEnum includeMode)
         {
             var resultQueryable = queryable;
-            if (includeMode == UsersIncludeModeEnum.IncludeAll)
+            if (includeMode >= UsersIncludeModeEnum.IncludeRefreshTokens)
             {
-                resultQueryable = resultQueryable
-                    .Include(u => u.AttemptStatuses)
-                    .ThenInclude(a => a.QuestionStatuses)
-                    .ThenInclude(qs => qs.Answer)
-                    ;
+                resultQueryable = queryable
+                    .Include(u => u.RefreshToken);
 
-                resultQueryable = resultQueryable
-                    .Include(u => u.AttemptStatuses)
-                    .ThenInclude(a => a.QuestionStatuses)
-                    .ThenInclude(qs => qs.AnswerCorrectnessDetails);
+                if (includeMode == UsersIncludeModeEnum.IncludeAll)
+                {
+                    resultQueryable = resultQueryable
+                        .Include(u => u.AttemptStatuses)
+                        .ThenInclude(a => a.QuestionStatuses)
+                        .ThenInclude(qs => qs.Answer)
+                        ;
+
+                    resultQueryable = resultQueryable
+                        .Include(u => u.AttemptStatuses)
+                        .ThenInclude(a => a.QuestionStatuses)
+                        .ThenInclude(qs => qs.AnswerCorrectnessDetails);
+                }
             }
             return resultQueryable;
         }
-        public async Task<List<UserEntity>> GetUsers(IEnumerable<Guid> ids, UsersGetOptions options)
+        public async Task<List<UserEntity>> GetUsersAsync(IEnumerable<Guid> ids, UsersGetOptions options)
         {
             var ctx = await _ctxFactory.CreateDbContextAsync();
 
@@ -107,6 +105,28 @@ namespace LiTest.Server.Infrastructure.Data
 
             var users = await usersQuery.ToListAsync();
             return users;
+        }
+
+        public async Task<UserEntity?> TryGetUserAsync(Guid id)
+        {
+            var ctx = await _ctxFactory.CreateDbContextAsync();
+
+            var result = await ctx.Users
+                .AsNoTracking()
+                .FirstOrDefaultAsync(u => u.Id == id);
+
+            return result;
+        }
+
+        public async Task<UserEntity?> TryGetUserByLoginAsync(string email)
+        {
+            var ctx = await _ctxFactory.CreateDbContextAsync();
+
+            var result = await ctx.Users
+                .AsNoTracking()
+                .FirstOrDefaultAsync(u => u.Login == email);
+
+            return result;
         }
 
         public Task ExecuteOnUserAsync(Guid id, Func<UserEntity, Task> action)
