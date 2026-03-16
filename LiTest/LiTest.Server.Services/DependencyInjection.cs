@@ -1,4 +1,6 @@
 ﻿using FluentValidation;
+using LiTest.Server.Core.Services;
+using LiTest.Server.Services.Community;
 using LiTest.Server.Services.Validators;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -11,7 +13,9 @@ namespace LiTest.Server.Services
             // Adding validators
             services.AddValidatorsFromAssemblyContaining<UserRegistrationValidator>();
 
-
+            // Services
+            services.AddScoped<IUserMainService, UserMainService>();
+            services.AddScoped<IUserSecurityService, UserSecurityService>();
 
             return services;
         }

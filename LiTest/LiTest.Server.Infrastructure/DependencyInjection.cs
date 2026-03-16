@@ -9,7 +9,7 @@ namespace LiTest.Server.Infrastructure
     {
         public static IServiceCollection AddInfrastructureServices(this IServiceCollection services)
         {
-            services.AddSingleton<ILiTestRepository, LiTestRepository>();
+            services.AddScoped<ILiTestRepository, LiTestRepository>();
             services.AddSingleton<IJwtProvider, IJwtProvider>();
 
             return services;

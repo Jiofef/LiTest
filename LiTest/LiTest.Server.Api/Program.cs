@@ -2,9 +2,12 @@ using LiTest.Server.Infrastructure;
 using LiTest.Server.Infrastructure.Data;
 using LiTest.Server.Infrastructure.Security;
 using LiTest.Server.Services;
+using Microsoft.AspNetCore.RateLimiting;
+using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
 using Swashbuckle.AspNetCore.Swagger;
+using System.Threading.RateLimiting;
 
 public partial class Program
 {
@@ -18,6 +21,27 @@ public partial class Program
         // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
         builder.Services.AddOpenApi();
         builder.Services.AddSwaggerGen();
+
+        builder.Services.AddRouting(options => options.LowercaseUrls = true);
+
+        // Anti DDoS
+        builder.Services.AddRateLimiter(options =>
+        {
+            options.AddFixedWindowLimiter("fixed", opt =>
+            {
+                opt.Window = TimeSpan.FromSeconds(1);
+                opt.PermitLimit = 5;                
+                opt.QueueLimit = 0;                 
+                opt.QueueProcessingOrder = QueueProcessingOrder.OldestFirst;
+            });
+        });
+        builder.WebHost.ConfigureKestrel(serverOptions =>
+        {
+            serverOptions.Limits.MaxRequestBodySize = 10 * 1024;
+
+            serverOptions.Limits.MinRequestBodyDataRate =
+                new MinDataRate(bytesPerSecond: 100, gracePeriod: TimeSpan.FromSeconds(10));
+        });
 
         ConfigureDiBuilder(builder);
 
@@ -35,6 +59,7 @@ public partial class Program
         app.UseHttpsRedirection();
         app.UseAuthorization();
         app.MapControllers();
+        app.UseRateLimiter();   
 
         app.Run();
     }

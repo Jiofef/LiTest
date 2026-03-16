@@ -1,6 +1,6 @@
 ﻿using LiTest.Shared.Core.Testing;
 
-namespace LiTest.Server.Services
+namespace LiTest.Server.Services.Testing.Passing
 {
     public class AnswerCheckService
     {
@@ -32,22 +32,6 @@ namespace LiTest.Server.Services
                 default:
                     throw new InvalidOperationException("An unknown answer type was used");
             }    
-        }
-    }
-
-    public class TestPassingService
-    {
-        public bool TryStartTest()
-        {
-            return false;
-        }
-        public bool TryStopTest()
-        {
-            return false;
-        }
-        public bool TryAnswer()
-        {
-            return false;
         }
     }
 }

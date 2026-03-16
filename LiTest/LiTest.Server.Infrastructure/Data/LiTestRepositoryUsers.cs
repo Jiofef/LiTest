@@ -1,10 +1,7 @@
 ﻿using LiTest.Server.Core.Contracts.Data;
 using LiTest.Server.Infrastructure.Testing;
 using LiTest.Shared.Core.Community;
-using LiTest.Shared.Core.Testing;
 using Microsoft.EntityFrameworkCore;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
-
 
 namespace LiTest.Server.Infrastructure.Data
 {
@@ -12,61 +9,92 @@ namespace LiTest.Server.Infrastructure.Data
     {
         public async Task<Guid> AddUserAsync(UserEntity user)
         {
-            await using var db = _ctxFactory.CreateDbContext();
-
-            db.Users.Add(user);
-            await db.SaveChangesAsync();
+            _context.Users.Add(user);
+            await _context.SaveChangesAsync();
             return user.Id;
         }
 
-        /// <summary>
-        /// Prefer soft delete
-        /// </summary>
         public async Task<bool> HardDeleteUserAsync(Guid uid)
         {
-            await using var db = _ctxFactory.CreateDbContext();
-
-            var user = await db.Users
-                .FirstOrDefaultAsync(r => r.Id == uid);
-
+            var user = await _context.Users.FirstOrDefaultAsync(r => r.Id == uid);
             if (user != null)
             {
-                db.Users.Remove(user);
-                await db.SaveChangesAsync();
+                _context.Users.Remove(user);
+                await _context.SaveChangesAsync();
                 return true;
             }
             return false;
         }
+
         public async Task<bool> SoftDeleteUserAsync(Guid uid)
         {
-            await using var db = _ctxFactory.CreateDbContext();
-
-            var user = await db.Users
-                .FirstOrDefaultAsync(r => r.Id == uid);
-
+            var user = await _context.Users.FirstOrDefaultAsync(r => r.Id == uid);
             if (user != null && user.DeletedAt == null)
             {
                 user.DeletedAt = DateTime.UtcNow;
-                await db.SaveChangesAsync();
+                await _context.SaveChangesAsync();
                 return true;
             }
             return false;
         }
+
         public async Task<bool> RestoreUserAsync(Guid uid)
         {
-            await using var db = _ctxFactory.CreateDbContext();
-
-            var user = await db.Users
-                .FirstOrDefaultAsync(r => r.Id == uid);
-
+            var user = await _context.Users.FirstOrDefaultAsync(r => r.Id == uid);
             if (user != null && user.DeletedAt != null)
             {
                 user.DeletedAt = null;
-                await db.SaveChangesAsync();
+                await _context.SaveChangesAsync();
                 return true;
             }
             return false;
         }
+
+        public async Task<List<UserEntity>> GetUsersAsync(IEnumerable<Guid> ids, UsersGetOptions? options = null)
+        {
+            options ??= new();
+            var query = _context.Users.Where(u => ids.Contains(u.Id)).AsNoTracking();
+            query = GetUsersQueryIncluding(query, options.IncludeMode);
+            return await query.ToListAsync();
+        }
+
+        public async Task<UserEntity?> TryGetUserAsync(Guid id, UsersGetOptions? options = null)
+        {
+            options ??= new();
+            var query = _context.Users.AsNoTracking();
+            query = GetUsersQueryIncluding(query, options.IncludeMode);
+            return await query.FirstOrDefaultAsync(u => u.Id == id);
+        }
+
+        public async Task<UserEntity?> TryGetUserByLoginAsync(string login, UsersGetOptions? options = null)
+        {
+            options ??= new();
+            var query = _context.Users.AsNoTracking();
+            query = GetUsersQueryIncluding(query, options.IncludeMode);
+            return await query.FirstOrDefaultAsync(u => u.Login == login);
+        }
+
+        public async Task<TResult> ExecuteOnUserAsync<TResult>(Guid id, Func<UserEntity, Task<TResult>> action)
+        {
+            var queryable = _context.Users.AsQueryable();
+            queryable = GetUsersQueryIncluding(queryable, UsersIncludeModeEnum.IncludeAll);
+            var user = await queryable.FirstOrDefaultAsync(t => t.Id == id);
+
+            if (user == null) throw new KeyNotFoundException();
+
+            var result = await action(user);
+            await _context.SaveChangesAsync();
+            return result;
+        }
+        // Overload for actions without return value
+        public Task ExecuteOnUserAsync(Guid id, Func<UserEntity, Task> action)
+            => ExecuteOnUserAsync(id, async r =>
+            {
+                await action(r);
+                return true;
+            });
+
+        // Query modifying
         private IQueryable<UserEntity> GetUsersQueryIncluding(IQueryable<UserEntity> queryable, UsersIncludeModeEnum includeMode)
         {
             var resultQueryable = queryable;
@@ -90,67 +118,6 @@ namespace LiTest.Server.Infrastructure.Data
                 }
             }
             return resultQueryable;
-        }
-        public async Task<List<UserEntity>> GetUsersAsync(IEnumerable<Guid> ids, UsersGetOptions options)
-        {
-            var ctx = await _ctxFactory.CreateDbContextAsync();
-
-            var result = new List<UserEntity>();
-
-            var usersQuery = ctx.Users
-                .Where(u => ids.Contains(u.Id))
-                .AsNoTracking();
-
-            usersQuery = GetUsersQueryIncluding(usersQuery, options.IncludeMode);
-
-            var users = await usersQuery.ToListAsync();
-            return users;
-        }
-
-        public async Task<UserEntity?> TryGetUserAsync(Guid id)
-        {
-            var ctx = await _ctxFactory.CreateDbContextAsync();
-
-            var result = await ctx.Users
-                .AsNoTracking()
-                .FirstOrDefaultAsync(u => u.Id == id);
-
-            return result;
-        }
-
-        public async Task<UserEntity?> TryGetUserByLoginAsync(string email)
-        {
-            var ctx = await _ctxFactory.CreateDbContextAsync();
-
-            var result = await ctx.Users
-                .AsNoTracking()
-                .FirstOrDefaultAsync(u => u.Login == email);
-
-            return result;
-        }
-
-        public Task ExecuteOnUserAsync(Guid id, Func<UserEntity, Task> action)
-            => ExecuteOnUserAsync(id, async r =>
-            {
-                await (action(r));
-                return true; // dummy value
-            });
-        public async Task<TResult> ExecuteOnUserAsync<TResult>(Guid id, Func<UserEntity, Task<TResult>> action)
-        {
-            await using var ctx = _ctxFactory.CreateDbContext();
-
-            var queryable = ctx.Users.AsQueryable();
-            queryable = GetUsersQueryIncluding(queryable, UsersIncludeModeEnum.IncludeAll);
-            var user = await queryable
-                .FirstOrDefaultAsync(t => t.Id == id);
-
-            if (user == null)
-                throw new KeyNotFoundException();
-
-            var result = await action(user);
-
-            await ctx.SaveChangesAsync();
-            return result;
         }
     }
 }

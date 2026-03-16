@@ -28,21 +28,23 @@ namespace LiTest.Server.Core.Contracts.Data
     {
         Task<Guid> AddTestAsync(LiTestEntity test);
         Task<Guid> AddUserAsync(UserEntity user);
+        Task<ITransactionWrapper> BeginTransactionAsync();
         Task ExecuteOnTestAsync(Guid id, Func<LiTestEntity, Task> action);
         Task<TResult> ExecuteOnTestAsync<TResult>(Guid id, Func<LiTestEntity, Task<TResult>> action);
         Task ExecuteOnUserAsync(Guid id, Func<UserEntity, Task> action);
         Task<TResult> ExecuteOnUserAsync<TResult>(Guid id, Func<UserEntity, Task<TResult>> action);
         Task<List<LiTestEntity>> GetTestsAsync(IEnumerable<Guid> ids, LiTestGetOptions options);
-        Task<List<UserEntity>> GetUsersAsync(IEnumerable<Guid> ids, UsersGetOptions options);
+        Task<List<UserEntity>> GetUsersAsync(IEnumerable<Guid> ids, UsersGetOptions? options = null);
         Task<bool> HardDeleteTestAsync(Guid uid);
         Task<bool> HardDeleteUserAsync(Guid uid);
         Task<bool> RestoreTestAsync(Guid uid);
         Task<bool> RestoreUserAsync(Guid uid);
+        Task SaveChangesAsync();
         Task<List<LiTestEntity>> SearchTestsAsync(string query, int lastId, LiTestGetOptions options, int limit = 20);
         Task<bool> SoftDeleteTestAsync(Guid uid);
         Task<bool> SoftDeleteUserAsync(Guid uid);
         Task<LiTestEntity?> TryGetTestAsync(Guid id);
-        Task<UserEntity?> TryGetUserAsync(Guid id);
-        Task<UserEntity?> TryGetUserByLoginAsync(string email);
+        Task<UserEntity?> TryGetUserAsync(Guid id, UsersGetOptions? options = null);
+        Task<UserEntity?> TryGetUserByLoginAsync(string login, UsersGetOptions? options = null);
     }
 }

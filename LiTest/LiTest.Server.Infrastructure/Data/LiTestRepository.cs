@@ -1,16 +1,25 @@
 ﻿using LiTest.Server.Core.Contracts.Data;
 using Microsoft.EntityFrameworkCore;
-
+using Microsoft.EntityFrameworkCore.Storage;
 
 namespace LiTest.Server.Infrastructure.Data
 {
     public partial class LiTestRepository : ILiTestRepository
     {
-        private readonly IDbContextFactory<LiTestDbContext> _ctxFactory;
+        private readonly LiTestDbContext _context;
 
-        public LiTestRepository(IDbContextFactory<LiTestDbContext> contextFactory)
+        public LiTestRepository(LiTestDbContext context)
         {
-            _ctxFactory = contextFactory;
+            _context = context;
         }
+
+        public async Task<ITransactionWrapper> BeginTransactionAsync()
+        {
+            var tx = await _context.Database.BeginTransactionAsync();
+            return new EfTransactionWrapper(tx);
+        }
+
+        public async Task SaveChangesAsync()
+            => await _context.SaveChangesAsync();
     }
 }

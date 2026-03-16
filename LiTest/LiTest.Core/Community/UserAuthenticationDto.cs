@@ -4,5 +4,6 @@ using System.Text;
 
 namespace LiTest.Shared.Core.Community
 {
-    public record AuthResponseDto(Guid UserId, string AccessToken, string RefreshToken);
+    public record UserAuthenticationDto(string Login, string Password);
+
 }

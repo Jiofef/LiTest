@@ -1,4 +1,4 @@
-    using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc;
 
 namespace LiTest.Server.Core.Controllers
 {
